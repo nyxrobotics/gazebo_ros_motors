@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(gazebo_ros_motors)
+add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   gazebo_dev
@@ -21,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosconsole
   diagnostic_updater
   std_msgs
+  gazebo_plugins
 )
 
 include (FindPkgConfig)

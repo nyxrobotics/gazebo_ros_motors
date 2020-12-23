@@ -155,11 +155,11 @@ void GazeboRosMotor::Reset() {
 }
 
 bool GazeboRosMotor::checkParameters() {
-   if ( this->armature_damping_ratio_ !=0.0 && !isnan(this->armature_damping_ratio_) &&
-        this->electric_inductance_ !=0.0 && !isnan(this->electric_inductance_) &&
-        this->electric_resistance_ !=0.0 && !isnan(this->electric_resistance_) &&
-        this->electromotive_force_constant_ !=0.0 && !isnan(this->electromotive_force_constant_) &&
-        this->moment_of_inertia_ !=0.0 && !isnan(this->moment_of_inertia_)) return true;
+   if ( this->armature_damping_ratio_ !=0.0 && !std::isnan(this->armature_damping_ratio_) &&
+        this->electric_inductance_ !=0.0 && !std::isnan(this->electric_inductance_) &&
+        this->electric_resistance_ !=0.0 && !std::isnan(this->electric_resistance_) &&
+        this->electromotive_force_constant_ !=0.0 && !std::isnan(this->electromotive_force_constant_) &&
+        this->moment_of_inertia_ !=0.0 && !std::isnan(this->moment_of_inertia_)) return true;
         else return false;
 }
 
