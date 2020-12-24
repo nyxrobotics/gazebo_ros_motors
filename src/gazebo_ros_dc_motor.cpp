@@ -358,6 +358,7 @@ void GazeboRosMotor::motorModelUpdate(double dt, double output_shaft_omega, doub
     // TODO: axis as param
     applied_torque.Z() = Km * i_t * gear_ratio_; // motor torque T_ext = K * i * n_gear
     this->link_->AddRelativeTorque(applied_torque);
+    // ROS_INFO_THROTTLE_NAMED(0.5, plugin_name_, "dt = %f ", dt);
 }
 
 // Plugin update function
@@ -369,7 +370,7 @@ void GazeboRosMotor::UpdateChild() {
     double actual_load = current_torque.Z();
 
     motorModelUpdate(seconds_since_last_update, current_output_speed, actual_load);
-
+    last_update_time_= current_time;
     if ( seconds_since_last_update > update_period_ ) {
         publishWheelJointState( current_output_speed, current_torque.Z() );
         publishMotorCurrent();
@@ -377,8 +378,8 @@ void GazeboRosMotor::UpdateChild() {
                               std::mt19937(std::random_device{}()));
         double current_noisy_output_speed = dist();
         publishRotorVelocity( current_noisy_output_speed );
-        publishEncoderCount( current_noisy_output_speed , seconds_since_last_update );
-        last_update_time_+= common::Time ( update_period_ );
+        // publishEncoderCount( current_noisy_output_speed , seconds_since_last_update );
+        // last_update_time_= common::Time ( update_period_ );
     }
 
     // If there was a parameter update, notify server
