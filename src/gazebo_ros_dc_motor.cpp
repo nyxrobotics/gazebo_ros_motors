@@ -33,8 +33,6 @@ void GazeboRosMotor::Load ( physics::ModelPtr _parent, sdf::ElementPtr _sdf ) {
 
     // global parameters
     gazebo_ros_->getParameter<std::string> ( command_topic_,  "command_topic",  "/motor/voltage_norm" );
-    gazebo_ros_->getParameter<double> ( update_rate_, "update_rate", 100.0 );
-
     // motor model parameters
     gazebo_ros_->getParameter<double> ( motor_nominal_voltage_, "motor_nominal_voltage", 24.0 ); // Datasheet 24.0V
     ROS_INFO_NAMED(plugin_name_, "motor_nominal_voltage_ = %f", motor_nominal_voltage_);
@@ -84,9 +82,8 @@ void GazeboRosMotor::Load ( physics::ModelPtr _parent, sdf::ElementPtr _sdf ) {
         ROS_INFO_NAMED(plugin_name_, "%s: Advertise joint_state", gazebo_ros_->info());
     }
 
-    if ( this->update_rate_ > 0.0 ) this->update_period_ = 1.0 / this->update_rate_; else this->update_period_ = 0.0;
-    last_update_time_ = parent->GetWorld()->SimTime();
 
+    last_update_time_ = parent->GetWorld()->SimTime();
     // command subscriber
     ROS_INFO_NAMED(plugin_name_, "%s: Trying to subscribe to %s", gazebo_ros_->info(), command_topic_.c_str());
     ros::SubscribeOptions so = ros::SubscribeOptions::create<std_msgs::Float32> (
@@ -370,18 +367,14 @@ void GazeboRosMotor::UpdateChild() {
     double actual_load = current_torque.Z();
 
     motorModelUpdate(seconds_since_last_update, current_output_speed, actual_load);
-    last_update_time_= current_time;
-    if ( seconds_since_last_update > update_period_ ) {
-        publishWheelJointState( current_output_speed, current_torque.Z() );
-        publishMotorCurrent();
-        auto dist = std::bind(std::normal_distribution<double>{current_output_speed, velocity_noise_},
-                              std::mt19937(std::random_device{}()));
-        double current_noisy_output_speed = dist();
-        publishRotorVelocity( current_noisy_output_speed );
-        // publishEncoderCount( current_noisy_output_speed , seconds_since_last_update );
-        // last_update_time_= common::Time ( update_period_ );
-    }
+	publishWheelJointState( current_output_speed, current_torque.Z() );
+	publishMotorCurrent();
+	auto dist = std::bind(std::normal_distribution<double>{current_output_speed, velocity_noise_},
+						  std::mt19937(std::random_device{}()));
+	double current_noisy_output_speed = dist();
+	publishRotorVelocity( current_noisy_output_speed );
 
+	last_update_time_= current_time;
     // If there was a parameter update, notify server
     paramServerUpdate();
 }

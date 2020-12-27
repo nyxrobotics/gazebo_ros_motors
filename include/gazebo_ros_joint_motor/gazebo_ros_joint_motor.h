@@ -65,7 +65,6 @@ namespace gazebo {
 
       // ODE
       double input_;
-      double update_rate_;
       double ode_joint_motor_fmax_;
       double ode_joint_fudge_factor_;
 

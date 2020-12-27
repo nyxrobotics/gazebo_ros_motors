@@ -33,7 +33,6 @@ void GazeboRosMotor::Load ( physics::ModelPtr _parent, sdf::ElementPtr _sdf )
 		// ode_joint_motor_fmax_ = maximum force the ODE joint-motor may apply during a time step
 		gazebo_ros_->getParameter<double> ( ode_joint_motor_fmax_, "ode_joint_motor_fmax", 50.0 );
 		gazebo_ros_->getParameter<double> ( ode_joint_fudge_factor_, "ode_joint_fudge_factor", 1.0 );
-		gazebo_ros_->getParameter<double> ( update_rate_, "update_rate", 100.0 );
 
 		// encoder parameters
 		gazebo_ros_->getParameterBoolean  ( publish_velocity_, "publish_velocity", true );
@@ -63,7 +62,6 @@ void GazeboRosMotor::Load ( physics::ModelPtr _parent, sdf::ElementPtr _sdf )
     }
 
 		// command subscription
-		if ( this->update_rate_ > 0.0 ) this->update_period_ = 1.0 / this->update_rate_; else this->update_period_ = 0.0;
 		last_update_time_ = parent->GetWorld()->SimTime();
     ROS_INFO_NAMED("motor_plugin", "%s: Trying to subscribe to %s", gazebo_ros_->info(), command_topic_.c_str());
     ros::SubscribeOptions so = ros::SubscribeOptions::create<std_msgs::Float32> (
@@ -144,14 +142,12 @@ void GazeboRosMotor::UpdateChild() {
 		joint_->SetParam("vel",  0, input_);
     common::Time current_time = parent->GetWorld()->SimTime();
     double seconds_since_last_update = ( current_time - last_update_time_ ).Double();
-		double current_speed = joint_->GetVelocity( 0u )*encoder_to_shaft_ratio_;
-		ignition::math::Vector3d current_torque = this->link_->RelativeTorque();
-    if ( seconds_since_last_update > update_period_ ) {
-				publishWheelJointState( current_speed, current_torque.Z() );
-				publishRotorVelocity( current_speed );
-				publishEncoderCount( current_speed , seconds_since_last_update );
-				last_update_time_+= common::Time ( update_period_ );
-    }
+	double current_speed = joint_->GetVelocity( 0u )*encoder_to_shaft_ratio_;
+	ignition::math::Vector3d current_torque = this->link_->RelativeTorque();
+	publishWheelJointState( current_speed, current_torque.Z() );
+	publishRotorVelocity( current_speed );
+	publishEncoderCount( current_speed , seconds_since_last_update );
+	last_update_time_= current_time;
 }
 
 // Finalize the controller

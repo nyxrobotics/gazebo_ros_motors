@@ -82,7 +82,6 @@ namespace gazebo {
       bool publish_encoder_;
       bool publish_motor_joint_state_;
       double input_;
-      double update_rate_;
 
       // Gearbox
       double gear_ratio_; /// reduction ratio, eg 10.0 means 1/10-th output angular velocity compared to motor inner vel.
